@@ -6,7 +6,7 @@ using Shared.Models;
 
 namespace ProductAPI.DataAccess
 {
-    interface DataAccess
+    public interface DataAccess
     {
 
         Task<Product[]> GetAllProducts(int storeId);

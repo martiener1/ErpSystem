@@ -56,6 +56,10 @@ namespace ProductAPI.Controllers
             if (user == null) return BadRequest("No valid session found for this token");
             if (user.storeId == null) return BadRequest("No store found for this user");
             Product product = await ProductService.GetProductById((int)user.storeId, id);
+            if (product == null)
+            {
+                return BadRequest("No product found with this Id");
+            }
             return Ok(Json.Serialize<Product>(product));
         }
 
@@ -67,6 +71,10 @@ namespace ProductAPI.Controllers
             if (user == null) return BadRequest("No valid session found for this token");
             if (user.storeId == null) return BadRequest("No store found for this user");
             Product product = await ProductService.GetProductByEAN((int)user.storeId, ean);
+            if (product == null)
+            {
+                return BadRequest("No product found with this Id");
+            }
             return Ok(Json.Serialize<Product>(product));
         }
 
@@ -78,6 +86,10 @@ namespace ProductAPI.Controllers
             if (user == null) return BadRequest("No valid session found for this token");
             if (user.storeId == null) return BadRequest("No store found for this user");
             Product product = await ProductService.GetProductByProductNumber((int)user.storeId, productNumber);
+            if (product == null)
+            {
+                return BadRequest("No product found with this Id");
+            }
             return Ok(Json.Serialize<Product>(product));
         }
 

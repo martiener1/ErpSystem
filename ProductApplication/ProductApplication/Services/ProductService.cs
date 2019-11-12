@@ -10,7 +10,7 @@ namespace ProductAPI.Services
     public static class ProductService
     {
 
-        private static DataAccess.DataAccess dataAccess = new DataAccessImplMySql();
+        public static DataAccess.DataAccess dataAccess = new DataAccessImplMySql();
         
         public async static Task<Product[]> GetAllProducts(int storeId)
         {

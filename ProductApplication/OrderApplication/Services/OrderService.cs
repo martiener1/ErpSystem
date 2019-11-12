@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OrderApplication.DataAccess;
+using StockAPI.DataAccess;
 using Shared.Models;
 
 namespace OrderApplication.Services
@@ -10,16 +10,16 @@ namespace OrderApplication.Services
     public static class OrderService
     {
 
-        private static OrderDataAccess dataAccess = new OrderDataAccessImplMySql();
+        public static OrderDataAccess dataAccess = new OrderDataAccessImplMySql();
         
         public static async Task<int?> GetNextOrderAmount(int storeId, long productId)
         {
             return await dataAccess.GetNextOrderAmount(storeId, productId);
         }
 
-        public static async Task UpdateNextOrderAmount(int storeId, long productId, int amount)
+        public static async Task<bool> UpdateNextOrderAmount(int storeId, long productId, int amount)
         {
-                await dataAccess.ChangeNextOrder(storeId, productId, amount);
+                return await dataAccess.ChangeNextOrder(storeId, productId, amount);
         }
 
         private static async Task CreateNextOrder(int storeId, long productId, int amount)

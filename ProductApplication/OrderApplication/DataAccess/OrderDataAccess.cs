@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Shared.Models;
 
-namespace OrderApplication.DataAccess
+namespace StockAPI.DataAccess
 {
-    interface OrderDataAccess
+    public interface OrderDataAccess
     {
 
         Task<int?> GetNextOrderAmount(int storeId, long productId);
 
-        Task ChangeNextOrder(int storeId, long productId, int amount);
+        Task<bool> ChangeNextOrder(int storeId, long productId, int amount);
 
         Task CreateNewOrder(int storeId, long productId, int amount);
     }

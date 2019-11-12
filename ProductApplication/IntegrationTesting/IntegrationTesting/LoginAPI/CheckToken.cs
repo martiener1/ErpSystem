@@ -3,6 +3,7 @@ using LoginAPI.DataAccess;
 using LoginAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
+using StockAPI.Controllers;
 using System;
 using System.Threading.Tasks;
 

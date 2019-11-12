@@ -37,5 +37,21 @@ namespace Shared.Models
             this.ean = ean;
             this.productGroup = productGroup;
         }
+
+        public override bool Equals(object obj)
+        {
+            Product product = obj as Product;
+            if (product == null) return false;
+
+            return this.storeId == product.storeId &&
+                    this.name == product.name &&
+                    this.brand == product.brand &&
+                    this.buyingPrice == product.buyingPrice &&
+                    this.sellingPrice == product.sellingPrice &&
+                    this.supplier == product.supplier &&
+                    this.productNumber == product.productNumber &&
+                    this.ean == product.ean &&
+                    this.productGroup.name == product.productGroup.name;
+        }
     }
 }

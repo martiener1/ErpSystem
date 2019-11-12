@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using OrderApplication.DataAccess;
+using StockAPI.DataAccess;
 using Shared.Models;
 using StockAPI.LocalModels;
+using Shared.Util;
 
 namespace OrderApplication.Services
 {
     public static class StockService
     {
 
-        private static StockDataAccess dataAccess = new StockDataAccessImplMySql();
+        public static StockDataAccess dataAccess = new StockDataAccessImplMySql();
 
         public static async Task AddMutation(int storeId, StockMutation mutation)
         {
@@ -30,7 +31,7 @@ namespace OrderApplication.Services
 
         public static async Task<int[]> GetRecentStockHistory(int storeId, long productId, int timeSpanInDays)
         {
-            return await GetStockHistory(storeId, productId, timeSpanInDays, DateTime.Now.AddDays(-timeSpanInDays));
+            return await GetStockHistory(storeId, productId, timeSpanInDays, DateTime.Now.AddDays(-timeSpanInDays + 1));
         }
 
         public static async Task<int[]> GetStockHistory(int storeId, long productId, int timeSpanInDays, DateTime startingDate)
@@ -60,20 +61,7 @@ namespace OrderApplication.Services
 
         private static DateTime ConvertStringToDateTime(string dateTimeAsString)
         {
-            if (dateTimeAsString.Length == 8)
-            {
-                int year;
-                int month;
-                int day;
-                if (Int32.TryParse(dateTimeAsString.Substring(0, 2), out day)
-                    && Int32.TryParse(dateTimeAsString.Substring(2, 2), out month)
-                    && Int32.TryParse(dateTimeAsString.Substring(4, 4), out year))
-                {
-                    return new DateTime(year, month, day);
-                }
-                else throw new ArgumentException();
-            }
-            else throw new ArgumentException();
+            return Json.Deserialize<DateTime>(dateTimeAsString);
         }
         
     }

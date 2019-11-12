@@ -8,7 +8,6 @@ using OrderApplication.Services;
 using Shared.Util;
 using System.Net.Http;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace StockAPI.Controllers
 {
@@ -57,8 +56,15 @@ namespace StockAPI.Controllers
             if (user == null) return BadRequest("No valid session found for this token");
             if (user.storeId == null) return BadRequest("No store found for this user");
 
-            await OrderService.UpdateNextOrderAmount((int)user.storeId, productId, amount);
-            return Ok("The next order has been updated");
+            bool updated = await OrderService.UpdateNextOrderAmount((int)user.storeId, productId, amount);
+            if (updated)
+            {
+                return Ok("The next order has been updated");
+            }
+            else
+            {
+                return CreatedAtAction("Order didn't exist, new one is made", amount);
+            }
         }
     }
 }

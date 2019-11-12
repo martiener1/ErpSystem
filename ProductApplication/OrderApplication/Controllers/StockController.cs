@@ -9,7 +9,6 @@ using StockAPI.LocalModels;
 using System.Net.Http;
 using Shared.Util;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace StockAPI.Controllers
 {
@@ -36,12 +35,12 @@ namespace StockAPI.Controllers
 
         // GET api/stock/current/123456                    return the current stuck of product with id 123456
         [HttpGet("current/{id}")]
-        public async Task<ActionResult<string>> GetCurrentStock(long id)
+        public async Task<ActionResult<string>> GetCurrentStock(long productId)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
             if (user == null) return BadRequest("No valid session found for this token");
             if (user.storeId == null) return BadRequest("No store found for this user");
-            int? currentStock = await StockService.GetCurrentStock((int)user.storeId, id);
+            int? currentStock = await StockService.GetCurrentStock((int)user.storeId, productId);
             if (currentStock == null)
             {
                 return NotFound("The current stock could not be found or calculated");
@@ -56,7 +55,15 @@ namespace StockAPI.Controllers
             UserData user = await GetUserData(Request.Headers["token"]);
             if (user == null) return BadRequest("No valid session found for this token");
             if (user.storeId == null) return BadRequest("No store found for this user");
-            await StockService.AddMutation((int)user.storeId, Shared.Util.Json.Deserialize<StockMutation>(value));
+            StockMutation mutation;
+            try
+            {
+                mutation = Json.Deserialize<StockMutation>(value);
+            } catch (Exception e)
+            {
+                return BadRequest("Could not process inputted mutation");
+            }
+            await StockService.AddMutation((int)user.storeId, mutation);
             return Ok("Mutation has been posted");
         }
 
@@ -67,11 +74,20 @@ namespace StockAPI.Controllers
             UserData user = await GetUserData(Request.Headers["token"]);
             if (user == null) return BadRequest("No valid session found for this token");
             if (user.storeId == null) return BadRequest("No store found for this user");
-            await StockService.AddMutationBulk((int)user.storeId, Shared.Util.Json.Deserialize<StockMutation[]>(value));
+            StockMutation[] mutations;
+            try
+            {
+                mutations = Json.Deserialize<StockMutation[]>(value);
+            }
+            catch (Exception e)
+            {
+                return BadRequest("Could not process inputted mutations");
+            }
+            await StockService.AddMutationBulk((int)user.storeId, mutations);
             return Ok("Mutations have been posted");
         }
 
-        // GET api/stock/history/123456/10                  return the stock from the most recent 10 days, one value for every end of the day
+        // GET api/stock/history/123456/10                  return the stock from the most recent 10 days, one value for every start of the day
         [HttpGet("history/{id}/{days}")]
         public async Task<ActionResult<string>> GetStockHistory(long id, int days)
         {

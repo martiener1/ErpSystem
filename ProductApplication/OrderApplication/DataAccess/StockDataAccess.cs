@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 using Shared.Models;
 using StockAPI.LocalModels;
 
-namespace OrderApplication.DataAccess
+namespace StockAPI.DataAccess
 {
-    interface StockDataAccess
+    public interface StockDataAccess
     {
 
         Task AddMutation(int storeId, StockMutation stockMutation);
 
         Task AddMutationBulk(int storeId, StockMutation[] stockMutations);
 
-        Task<int?> GetCurrentStock(int storeId, long productId);
+        Task<int> GetCurrentStock(int storeId, long productId);
 
         Task<int[]> GetStockHistory(int storeId, long productId, int timeSpanInDays, DateTime startingDate);
 

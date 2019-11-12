@@ -137,7 +137,7 @@ namespace ProductAPI.DataAccess
 
         private async Task<ProductGroup> GetProductGroup(int selectStoreId, int selectGroupId)
         {
-            string query = "select id, categoryId, `name` from `group` where storeId = @0 and id = @1;";
+            string query = "select `id`, `categoryId`, `name` from `group` where storeId = @0 and id = @1;";
             object[] row = await QueryExecutor.SelectSingle(NewConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectGroupId);
             CloseConnection();
             if (row[0] == null) return null; // empty record
@@ -151,7 +151,7 @@ namespace ProductAPI.DataAccess
 
         private async Task<ProductCategory> GetProductCategory(int selectStoreId, int selectCategoryId)
         {
-            string query = "select id, `name` from category where storeId = 1 and id = 1;";
+            string query = "select id, `name` from category where storeId = @0 and id = @1;";
             object[] row = await QueryExecutor.SelectSingle(NewConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectCategoryId);
             CloseConnection();
             if (row[0] == null) return null; // empty record

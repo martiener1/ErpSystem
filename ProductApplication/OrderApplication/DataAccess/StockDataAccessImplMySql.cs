@@ -7,7 +7,7 @@ using Shared.Data;
 using Shared.Models;
 using StockAPI.LocalModels;
 
-namespace OrderApplication.DataAccess
+namespace StockAPI.DataAccess
 {
     public class StockDataAccessImplMySql : StockDataAccess
     {
@@ -37,8 +37,9 @@ namespace OrderApplication.DataAccess
 
         public async Task AddMutation(int storeId, StockMutation stockMutation)
         {
-            string query = "INSERT INTO `stock`.`stockmutation` (`storeId`, `productId`, `amount`, `reason`, `datetime`) VALUES ('@0', '@1', '@2', '@3', '@4');";
+            string query = "INSERT INTO `stockmutation` (`storeId`, `productId`, `amount`, `reason`, `datetime`) VALUES (@0, @1, @2, @3, @4);";
             await QueryExecutor.Insert(NewConnection(), query, MySqlDbType.Int32, storeId, MySqlDbType.Int32, stockMutation.productId, MySqlDbType.Int32, stockMutation.amount, MySqlDbType.VarChar, stockMutation.reason, MySqlDbType.VarChar, stockMutation.dateTime.ToString("yyyy-MM-dd HH:mm:ss"));
+            CloseConnection();
         }
 
         public async Task AddMutationBulk(int storeId, StockMutation[] stockMutations)
@@ -60,7 +61,8 @@ namespace OrderApplication.DataAccess
         {
             string query = "select * from stockmutation where storeId = @0 and productId = @1 and `datetime` > @3 and `datetime` < date_add(@3, interval @2 day);";
             object[][] result = await QueryExecutor.SelectMultiple(NewConnection(), query, MySqlDbType.Int32, selectedStoreId, MySqlDbType.Int32, selectProductId, MySqlDbType.Int32, timeSpanInDays, MySqlDbType.DateTime, startingDate);
-            
+            CloseConnection();
+
             StockMutation[] mutations = new StockMutation[result.Length];
             int counter = 0;
             foreach (object[] row in result)
@@ -103,8 +105,9 @@ namespace OrderApplication.DataAccess
 
         private async Task<int> GetStock(int storeId, long productId, DateTime dateTime)
         {
-            string query = "select * from stock where storeId = @0 and productId = @1 and `date` = date(now());";
-            object[] result = await QueryExecutor.SelectSingle(NewConnection(), query, MySqlDbType.Int32, storeId, MySqlDbType.Int32, productId, MySqlDbType.DateTime, dateTime);
+            string query = "select amount from stock where storeId = @0 and productId = @1 and `date` = @2;";
+            object[] result = await QueryExecutor.SelectSingle(NewConnection(), query, MySqlDbType.Int32, storeId, MySqlDbType.Int32, productId, MySqlDbType.Date, dateTime);
+            CloseConnection();
 
             if (result[0] == null)
             {
@@ -117,6 +120,7 @@ namespace OrderApplication.DataAccess
         {
             string query = "select `date`, `amount` from stock where `date` in (select max(`date`) from stock where storeId = @0 and productId = @1 and `date` < @2);";
             object[] result = await QueryExecutor.SelectSingle(NewConnection(), query, MySqlDbType.Int32, storeId, MySqlDbType.Int32, productId, MySqlDbType.Date, date);
+            CloseConnection();
             int startingAmount;
             DateTime startingDateTime;
             if (result[0] == null)
@@ -130,13 +134,15 @@ namespace OrderApplication.DataAccess
                 startingAmount = (int)result[1];
             }
 
-            StockMutation[] mutations = await GetAllMutationsBetweenDates(storeId, productId, startingDateTime, date);
+            StockMutation[] mutations = await GetAllMutationsBetweenDates(storeId, productId, startingDateTime, date.Date);
 
             int stockAmount = startingAmount;
-
-            foreach (StockMutation m in mutations)
+            if (mutations != null)
             {
-                stockAmount += m.amount;
+                foreach (StockMutation m in mutations)
+                {
+                    stockAmount += m.amount;
+                }
             }
 
             await InsertStockAmount(storeId, productId, stockAmount, date);
@@ -144,14 +150,42 @@ namespace OrderApplication.DataAccess
             return stockAmount;
         }
 
-        private async Task<StockMutation[]> GetAllMutationsBetweenDates(int storeId, long productId, DateTime startingDate, DateTime endingDate)
+        private async Task<StockMutation[]> GetAllMutationsBetweenDates(int selectStoreId, long selectProductId, DateTime startingDate, DateTime endingDate)
         {
-            throw new NotImplementedException();
+            string query = "select * from stockmutation where storeId = @0 and productId = @1 and `datetime` > @2 and `datetime` < @3;";
+            object[][] result = await QueryExecutor.SelectMultiple(NewConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectProductId, MySqlDbType.DateTime, startingDate, MySqlDbType.DateTime, endingDate);
+            CloseConnection();
+            StockMutation[] mutations = new StockMutation[result.Length];
+            int counter = 0;
+            foreach (object[] row in result)
+            {
+                int mutationId = (int)row[0];
+                int storeId = (int)row[1];
+                int productId = (int)row[2];
+                int amount = (int)row[3];
+                string reasonString = (string)row[4];
+                MutationReason reason = Enum.Parse<MutationReason>(reasonString);
+                DateTime dateTime = (DateTime)row[5];
+
+                StockMutation mutation = new StockMutation(mutationId, storeId, productId, amount, reason, dateTime);
+                mutations[counter] = mutation;
+                counter++;
+            }
+            if (counter > 0)
+            {
+                return mutations;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private async Task InsertStockAmount(int storeId, long productId, int amount, DateTime date)
         {
-            throw new NotImplementedException();
+            string query = "INSERT INTO `stock` (`storeId`, `productId`, `amount`, `date`) VALUES (@0, @1, @2, @3);";
+            await QueryExecutor.Insert(NewConnection(), query, MySqlDbType.Int32, storeId, MySqlDbType.Int32, productId, MySqlDbType.Int32, amount, MySqlDbType.DateTime, date);
+            CloseConnection();
         }
 
 

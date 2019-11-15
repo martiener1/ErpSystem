@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Testing.IntegrationTesting.LoginAPI;
 using StockAPI.Controllers;
 using StockAPI.LocalModels;
+using Shared.Data;
 
 namespace Testing.IntegrationTesting.StockAPI
 {
@@ -20,7 +21,7 @@ namespace Testing.IntegrationTesting.StockAPI
         public async Task Setup()
         {
             await DatabaseStockDummyFiller.EmptyAndFillDatabases();
-            string connectionString = "server=localhost;port=3306;database=stocktest;user=root;password=root";
+            string connectionString = DatabaseConnectionString.GetAzureConnectionString("stocktest");
             StockService.dataAccess = new StockDataAccessImplMySql(connectionString);
         }
 

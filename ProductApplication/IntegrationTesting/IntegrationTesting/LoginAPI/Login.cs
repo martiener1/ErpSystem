@@ -3,6 +3,7 @@ using LoginAPI.DataAccess;
 using LoginAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
+using Shared.Data;
 using System;
 using System.Threading.Tasks;
 
@@ -14,7 +15,7 @@ namespace Testing.IntegrationTesting.LoginAPI
         public async Task Setup()
         {
             await DatabaseLoginTestFiller.EmptyAndFillDatabases();
-            string connectionString = "server=localhost;port=3306;database=logintest;user=root;password=root";
+            string connectionString = DatabaseConnectionString.GetAzureConnectionString("logintest");
             LoginService.dataAccess = new DataAccessImplMySql(connectionString);
         }
 

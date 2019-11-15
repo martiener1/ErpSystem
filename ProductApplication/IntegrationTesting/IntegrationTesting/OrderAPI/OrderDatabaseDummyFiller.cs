@@ -13,7 +13,8 @@ namespace Testing.IntegrationTesting.OrderAPI
 
         public DatabaseOrderDummyFiller()
         {
-            dbAccess = new DatabaseAccess("server=localhost;port=3306;database=ordertest;user=root;password=root");
+            string connectionString = DatabaseConnectionString.GetAzureConnectionString("ordertest"); ;
+            dbAccess = new DatabaseAccess(connectionString);
         }
 
         public static async Task EmptyAndFillDatabases()

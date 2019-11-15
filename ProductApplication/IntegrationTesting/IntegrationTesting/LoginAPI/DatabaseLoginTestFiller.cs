@@ -13,7 +13,8 @@ namespace Testing.IntegrationTesting.LoginAPI
 
         public DatabaseLoginTestFiller()
         {
-            dbAccess = new DatabaseAccess("server=localhost;port=3306;database=logintest;user=root;password=root");
+            string connectionString = DatabaseConnectionString.GetAzureConnectionString("logintest");
+            dbAccess = new DatabaseAccess(connectionString);
         }
 
         public static async Task EmptyAndFillDatabases()

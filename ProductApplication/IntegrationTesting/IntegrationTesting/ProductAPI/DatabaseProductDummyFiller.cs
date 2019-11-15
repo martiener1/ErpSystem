@@ -13,7 +13,8 @@ namespace Testing.IntegrationTesting.LoginAPI
 
         public DatabaseProductDummyFiller()
         {
-            dbAccess = new DatabaseAccess("server=localhost;port=3306;database=producttest;user=root;password=root");
+            string connectionString = DatabaseConnectionString.GetAzureConnectionString("producttest");
+            dbAccess = new DatabaseAccess(connectionString);
         }
 
         public static async Task EmptyAndFillDatabases()

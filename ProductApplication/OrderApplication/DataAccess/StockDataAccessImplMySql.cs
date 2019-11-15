@@ -20,7 +20,7 @@ namespace StockAPI.DataAccess
 
         public StockDataAccessImplMySql()
         {
-            this.dbConnectionString = "server=localhost;port=3306;database=stock;user=root;password=root";
+            this.dbConnectionString = DatabaseConnectionString.GetAzureConnectionString("stock");
         }
 
         private MySqlConnection NewConnection()

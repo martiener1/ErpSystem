@@ -7,6 +7,7 @@ using NUnit.Framework;
 using ProductAPI.Controllers;
 using ProductAPI.DataAccess;
 using ProductAPI.Services;
+using Shared.Data;
 using Shared.Models;
 using Shared.Util;
 using StockAPI.Controllers;
@@ -27,7 +28,7 @@ namespace Testing.IntegrationTesting.ProductAPI
         {
             await DatabaseLoginTestFiller.EmptyAndFillDatabases();
             await DatabaseProductDummyFiller.EmptyAndFillDatabases();
-            string connectionString = "server=localhost;port=3306;database=producttest;user=root;password=root";
+            string connectionString = DatabaseConnectionString.GetAzureConnectionString("producttest");
             ProductService.dataAccess = new DataAccessImplMySql(connectionString);
         }
 

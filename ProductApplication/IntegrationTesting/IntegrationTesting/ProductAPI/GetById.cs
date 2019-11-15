@@ -17,6 +17,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Testing.IntegrationTesting.LoginAPI;
+using Shared.Data;
 
 namespace Testing.IntegrationTesting.ProductAPI
 {
@@ -27,7 +28,7 @@ namespace Testing.IntegrationTesting.ProductAPI
         {
             await DatabaseLoginTestFiller.EmptyAndFillDatabases();
             await DatabaseProductDummyFiller.EmptyAndFillDatabases();
-            string connectionString = "server=localhost;port=3306;database=producttest;user=root;password=root";
+            string connectionString = DatabaseConnectionString.GetAzureConnectionString("producttest");
             ProductService.dataAccess = new DataAccessImplMySql(connectionString);
         }
 

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using OrderApplication.Services;
 using StockAPI.DataAccess;
 using StockAPI.Controllers;
+using Shared.Data;
 
 namespace Testing.IntegrationTesting.OrderAPI
 {
@@ -16,7 +17,7 @@ namespace Testing.IntegrationTesting.OrderAPI
         public async Task Setup()
         {
             await DatabaseOrderDummyFiller.EmptyAndFillDatabases();
-            string connectionString = "server=localhost;port=3306;database=ordertest;user=root;password=root";
+            string connectionString = DatabaseConnectionString.GetAzureConnectionString("ordertest");
             OrderService.dataAccess = new OrderDataAccessImplMySql(connectionString);
         }
 

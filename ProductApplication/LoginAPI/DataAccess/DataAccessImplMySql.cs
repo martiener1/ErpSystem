@@ -103,7 +103,7 @@ namespace LoginAPI.DataAccess
 
         public async Task<bool> IsTokenValid(string token)
         {
-            string query = "select expirationdate from tokens where token = @0;";
+            string query = "select expirationdate > now() from tokens where token = @0;";
             object[] row = await QueryExecutor.SelectSingle(NewConnection(), query, MySqlDbType.VarChar, token);
             CloseConnection();
 
@@ -112,8 +112,8 @@ namespace LoginAPI.DataAccess
                 return false;
             } else
             {
-                DateTime expirationDate = (DateTime)row[0];
-                if (expirationDate >= DateTime.Now)
+                int isValid = (int)(long)row[0];
+                if (isValid == 1)
                 {
                     return true;
                 } else

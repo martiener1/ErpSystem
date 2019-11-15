@@ -13,7 +13,8 @@ namespace Testing.IntegrationTesting.StockAPI
 
         public DatabaseStockDummyFiller()
         {
-            dbAccess = new DatabaseAccess("server=localhost;port=3306;database=stocktest;user=root;password=root");
+            string connectionString = DatabaseConnectionString.GetAzureConnectionString("stocktest");
+            dbAccess = new DatabaseAccess(connectionString);
         }
 
         public static async Task EmptyAndFillDatabases()

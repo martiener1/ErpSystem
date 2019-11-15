@@ -18,7 +18,7 @@ namespace StockAPI.DataAccess
             this.dbConnectionString = dbConnectionString;
         }
 
-        public StockDataAccessImplMySql() 
+        public StockDataAccessImplMySql()
         {
             this.dbConnectionString = DatabaseConnectionString.GetAzureConnectionString("stock");
         }

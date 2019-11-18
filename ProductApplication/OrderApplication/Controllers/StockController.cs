@@ -16,7 +16,7 @@ namespace StockAPI.Controllers
     public class StockController : ControllerBase
     {
         private readonly IHttpClientFactory httpClientFactory;
-        private readonly string baseUrlLoginAPI = "https://localhost:5001/api/";
+        private readonly string baseUrlLoginAPI = "https://martijnloginapi.azurewebsites.net/api/";
 
         public StockController(IHttpClientFactory httpClientFactory)
         {

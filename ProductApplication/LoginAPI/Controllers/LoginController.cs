@@ -37,7 +37,7 @@ namespace LoginAPI.Controllers
         [HttpGet("checktoken/{token}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<string>> CheckToken(string token)
+        public async Task<ActionResult<string>> CheckToken(string token) 
         {
             UserData userData = await LoginService.CheckTokenValidity(token);
             if (userData != null)

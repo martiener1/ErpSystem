@@ -17,7 +17,7 @@ namespace LoginAPI.Controllers
         private string[] endpoints = new string[] { "Hello World!"};
 
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public ActionResult<IEnumerable<string>> Get() 
         {
             DataAccessImplMySql data = new DataAccessImplMySql();
             //string s = data.Test();

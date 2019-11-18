@@ -12,7 +12,7 @@ namespace ProductAPI.Controllers
 {
     [Route("api/products")]
     [ApiController]
-    public class ProductController : ControllerBase
+    public class ProductController : ControllerBase 
     {
         private readonly IHttpClientFactory httpClientFactory;
         private readonly string baseUrlLoginAPI = "https://localhost:5001/api/";

@@ -20,7 +20,7 @@ namespace LoginAPI.DataAccess
 
         public DataAccessImplMySql()
         {
-            this.dbConnectionString = "server=localhost;port=3306;database=login;user=root;password=root";
+            this.dbConnectionString = DatabaseConnectionString.GetAzureConnectionString("login");
         }
 
         private MySqlConnection NewConnection()

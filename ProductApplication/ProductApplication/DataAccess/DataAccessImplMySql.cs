@@ -19,7 +19,7 @@ namespace ProductAPI.DataAccess
 
         public DataAccessImplMySql()
         {
-            this.dbConnectionString = "server=localhost;port=3306;database=product;user=root;password=root";
+            this.dbConnectionString = DatabaseConnectionString.GetAzureConnectionString("product");
         }
 
         private MySqlConnection NewConnection()

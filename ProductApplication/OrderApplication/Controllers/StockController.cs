@@ -38,8 +38,8 @@ namespace StockAPI.Controllers
         public async Task<ActionResult<string>> GetCurrentStock(long productId)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             int? currentStock = await StockService.GetCurrentStock((int)user.storeId, productId);
             if (currentStock == null)
             {
@@ -53,8 +53,8 @@ namespace StockAPI.Controllers
         public async Task<ActionResult<string>> PostMutation([FromBody] string value)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             StockMutation mutation;
             try
             {
@@ -72,8 +72,8 @@ namespace StockAPI.Controllers
         public async Task<ActionResult<string>> PostBulkMutation([FromBody] string value)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             StockMutation[] mutations;
             try
             {
@@ -92,8 +92,8 @@ namespace StockAPI.Controllers
         public async Task<ActionResult<string>> GetStockHistory(long id, int days)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             int[] stockHistory = await StockService.GetRecentStockHistory((int)user.storeId, id, days);
             return Ok(Shared.Util.Json.Serialize<int[]>(stockHistory));
         }
@@ -103,8 +103,8 @@ namespace StockAPI.Controllers
         public async Task<ActionResult<string>> GetStockHistory(long id, int days, string date)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             int[] stockHistory = await StockService.GetStockHistory((int)user.storeId, id, days, date);
             return Ok(Shared.Util.Json.Serialize<int[]>(stockHistory));
         }
@@ -114,8 +114,8 @@ namespace StockAPI.Controllers
         public async Task<ActionResult<string>> GetMutations(long id, int days, string date)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             StockMutation[] mutationHistory = await StockService.GetStockMutations((int)user.storeId, id, days, date);
             return Ok(Shared.Util.Json.Serialize<StockMutation[]>(mutationHistory));
         }
@@ -125,8 +125,8 @@ namespace StockAPI.Controllers
         public async Task<ActionResult<string>> GetMutations(long id, int days)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             StockMutation[] mutationHistory = await StockService.GetRecentStockMutations((int)user.storeId, id, days);
             return Ok(Shared.Util.Json.Serialize<StockMutation[]>(mutationHistory));
         }

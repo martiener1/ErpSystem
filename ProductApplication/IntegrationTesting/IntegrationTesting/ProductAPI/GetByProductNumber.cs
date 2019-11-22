@@ -45,15 +45,15 @@ namespace Testing.IntegrationTesting.ProductAPI
         {
             ProductController controller = ControllerCreator.CreateProductControllerWrongToken();
             ActionResult<string> result = await controller.GetByProductNumber("123456");
-            Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+            Assert.IsInstanceOf<UnauthorizedObjectResult>(result.Result);
         }
 
         [Test]
-        public async Task TestWrongEan()
+        public async Task TestWrongProductNumber()
         {
             ProductController controller = ControllerCreator.CreateProductControllerCorrectToken();
             ActionResult<string> result = await controller.GetByProductNumber("NotExisting");
-            Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+            Assert.IsInstanceOf<NotFoundObjectResult>(result.Result);
         }
     }
 }

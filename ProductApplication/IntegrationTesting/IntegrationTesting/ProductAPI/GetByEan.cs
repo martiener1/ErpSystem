@@ -45,7 +45,7 @@ namespace Testing.IntegrationTesting.ProductAPI
         {
             ProductController controller = ControllerCreator.CreateProductControllerWrongToken();
             ActionResult<string> result = await controller.GetProductByEan("8718123456721");
-            Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+            Assert.IsInstanceOf<UnauthorizedObjectResult>(result.Result);
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace Testing.IntegrationTesting.ProductAPI
         {
             ProductController controller = ControllerCreator.CreateProductControllerCorrectToken();
             ActionResult<string> result = await controller.GetProductByEan("NotExisting");
-            Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+            Assert.IsInstanceOf<NotFoundObjectResult>(result.Result);
         }
     }
 }

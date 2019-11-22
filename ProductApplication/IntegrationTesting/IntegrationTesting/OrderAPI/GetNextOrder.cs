@@ -34,7 +34,7 @@ namespace Testing.IntegrationTesting.OrderAPI
         {
             OrderController controller = ControllerCreator.CreateOrderControllerWrongToken();
             ActionResult<string> result = await controller.Get(1);
-            Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+            Assert.IsInstanceOf<UnauthorizedObjectResult>(result.Result);
         }
 
         [Test]

@@ -47,7 +47,7 @@ namespace Testing.IntegrationTesting.ProductAPI
         {
             ProductController controller = ControllerCreator.CreateProductControllerWrongToken();
             ActionResult<IEnumerable<string>> result = await controller.GetAll();
-            Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+            Assert.IsInstanceOf<UnauthorizedObjectResult>(result.Result);
         }
     }
 }

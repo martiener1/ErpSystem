@@ -40,8 +40,8 @@ namespace StockAPI.Controllers
         public async Task<ActionResult<string>> Get(int productId)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
 
             int? amount = await OrderService.GetNextOrderAmount((int)user.storeId, productId);
             if (amount == null) return NotFound("No order found");
@@ -53,8 +53,8 @@ namespace StockAPI.Controllers
         public async Task<ActionResult<string>> Put(int productId, int amount)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
 
             bool updated = await OrderService.UpdateNextOrderAmount((int)user.storeId, productId, amount);
             if (updated)

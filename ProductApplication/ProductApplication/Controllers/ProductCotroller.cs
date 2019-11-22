@@ -36,8 +36,8 @@ namespace ProductAPI.Controllers
         public async Task<ActionResult<IEnumerable<string>>> GetAll()
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             Product[] productArray = await ProductService.GetAllProducts((int)user.storeId);
             string[] returnArray = new string[productArray.Length];
             for (int i = 0; i < productArray.Length; i++)
@@ -52,12 +52,12 @@ namespace ProductAPI.Controllers
         public async Task<ActionResult<string>> GetById(long id)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             Product product = await ProductService.GetProductById((int)user.storeId, id);
             if (product == null)
             {
-                return BadRequest("No product found with this Id");
+                return NotFound("No product found with this Id");
             }
             return Ok(Json.Serialize<Product>(product));
         }
@@ -67,12 +67,12 @@ namespace ProductAPI.Controllers
         public async Task<ActionResult<string>> GetProductByEan(string ean)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             Product product = await ProductService.GetProductByEAN((int)user.storeId, ean);
             if (product == null)
             {
-                return BadRequest("No product found with this Id");
+                return NotFound("No product found with this Id");
             }
             return Ok(Json.Serialize<Product>(product));
         }
@@ -82,12 +82,12 @@ namespace ProductAPI.Controllers
         public async Task<ActionResult<string>> GetByProductNumber(string productNumber)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             Product product = await ProductService.GetProductByProductNumber((int)user.storeId, productNumber);
             if (product == null)
             {
-                return BadRequest("No product found with this Id");
+                return NotFound("No product found with this Id");
             }
             return Ok(Json.Serialize<Product>(product));
         }
@@ -97,8 +97,8 @@ namespace ProductAPI.Controllers
         public async Task<ActionResult<string>> Post([FromBody] string value)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             Product product = await ProductService.AddNewProduct((int)user.storeId, Json.Deserialize<Product>(value));
             return Ok(Json.Serialize<Product>(product));
         }
@@ -108,8 +108,8 @@ namespace ProductAPI.Controllers
         public async Task<ActionResult<string>> Put(long id, [FromBody] string value)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             Product productNew = Json.Deserialize<Product>(value);
             productNew.id = id;
             Product product = await ProductService.AlterProduct((int)user.storeId, productNew);
@@ -121,8 +121,8 @@ namespace ProductAPI.Controllers
         public async Task<ActionResult<string>> Delete(int id)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
-            if (user == null) return BadRequest("No valid session found for this token");
-            if (user.storeId == null) return BadRequest("No store found for this user");
+            if (user == null) return Unauthorized("No valid session found for this token");
+            if (user.storeId == null) return Unauthorized("No store found for this user");
             await ProductService.DeleteProduct((int)user.storeId, id);
             return Ok("Product deleted succesfully");
         }

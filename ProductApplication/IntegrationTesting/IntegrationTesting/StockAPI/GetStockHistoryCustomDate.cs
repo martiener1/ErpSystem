@@ -47,7 +47,7 @@ namespace Testing.IntegrationTesting.StockAPI
             StockController controller = ControllerCreator.CreateStockControllerWrongToken();
             string dateTimeString = Json.Serialize<DateTime>(DateTime.Now.AddDays(-10));
             ActionResult<string> result = await controller.GetStockHistory(1, 3, dateTimeString);
-            Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+            Assert.IsInstanceOf<UnauthorizedObjectResult>(result.Result);
         }
 
         [Test]

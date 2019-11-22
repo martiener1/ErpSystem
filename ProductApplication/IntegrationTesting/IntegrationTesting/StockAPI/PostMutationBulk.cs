@@ -64,7 +64,7 @@ namespace Testing.IntegrationTesting.StockAPI
 
             string mutationsString = Json.Serialize<StockMutation[]>(mutations);
             ActionResult<string> result = await controller.PostBulkMutation(mutationsString);
-            Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+            Assert.IsInstanceOf<UnauthorizedObjectResult>(result.Result);
         }
 
         [Test]

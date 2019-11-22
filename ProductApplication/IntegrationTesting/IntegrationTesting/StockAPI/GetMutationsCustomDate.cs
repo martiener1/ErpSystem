@@ -56,7 +56,7 @@ namespace Testing.IntegrationTesting.StockAPI
             StockController controller = ControllerCreator.CreateStockControllerWrongToken();
             string dateTime = Json.Serialize<DateTime>(DateTime.Now);
             ActionResult<string> result = await controller.GetMutations(1, 10, dateTime);
-            Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+            Assert.IsInstanceOf<UnauthorizedObjectResult>(result.Result);
         }
 
         [Test]

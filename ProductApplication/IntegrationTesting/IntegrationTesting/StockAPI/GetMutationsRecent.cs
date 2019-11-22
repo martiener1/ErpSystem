@@ -54,7 +54,7 @@ namespace Testing.IntegrationTesting.StockAPI
         {
             StockController controller = ControllerCreator.CreateStockControllerWrongToken();
             ActionResult<string> result = await controller.GetMutations(1, 10);
-            Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+            Assert.IsInstanceOf<UnauthorizedObjectResult>(result.Result);
         }
 
         [Test]

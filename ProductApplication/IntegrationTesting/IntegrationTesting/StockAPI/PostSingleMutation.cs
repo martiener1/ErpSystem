@@ -50,7 +50,7 @@ namespace Testing.IntegrationTesting.StockAPI
             StockMutation mutation = new StockMutation(null, 1, 1, -1, MutationReason.Sold, DateTime.Now.AddDays(-1));
             string mutationString = Json.Serialize<StockMutation>(mutation);
             ActionResult<string> result = await controller.PostMutation(mutationString);
-            Assert.IsInstanceOf<BadRequestObjectResult>(result.Result);
+            Assert.IsInstanceOf<UnauthorizedObjectResult>(result.Result);
         }
 
         [Test]

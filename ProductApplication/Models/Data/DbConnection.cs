@@ -38,7 +38,7 @@ namespace Shared.Data
         {
             if (IsConnected())
             {
-                return false;
+                connection.Dispose();
             }
             connection = new MySqlConnection(connString);
             //connection.Open();

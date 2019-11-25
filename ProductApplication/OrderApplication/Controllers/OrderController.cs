@@ -43,6 +43,8 @@ namespace StockAPI.Controllers
             if (user == null) return Unauthorized("No valid session found for this token");
             if (user.storeId == null) return Unauthorized("No store found for this user");
 
+            return Ok(user.storeId + "  |  " + productId);
+
             int? amount = await OrderService.GetNextOrderAmount((int)user.storeId, productId);
             if (amount == null) return NotFound("No order found");
             return Ok(amount);

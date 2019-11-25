@@ -36,14 +36,12 @@ namespace StockAPI.Controllers
         // PUT api/orders/nextorder/123456/24                    change the next order amount for product 123456 to 24
 
         // GET api/orders/nextorder/123456
-        [HttpGet("nextorder/{id}")]
+        [HttpGet("nextorder/{productId}")]
         public async Task<ActionResult<string>> Get(int productId)
         {
             UserData user = await GetUserData(Request.Headers["token"]);
             if (user == null) return Unauthorized("No valid session found for this token");
             if (user.storeId == null) return Unauthorized("No store found for this user");
-
-            return Ok(user.storeId + "  |  " + productId);
 
             int? amount = await OrderService.GetNextOrderAmount((int)user.storeId, productId);
             if (amount == null) return NotFound("No order found");
@@ -51,7 +49,7 @@ namespace StockAPI.Controllers
         }
 
         // PUT api/orders/nextorder/123456/24
-        [HttpPut("nextorder/{id}/{amount}")]
+        [HttpPut("nextorder/{productId}/{amount}")]
         public async Task<ActionResult<string>> Put(int productId, int amount)
         {
             UserData user = await GetUserData(Request.Headers["token"]);

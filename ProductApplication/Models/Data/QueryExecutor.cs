@@ -32,6 +32,7 @@ namespace Shared.Data
             {
                 reader.GetValues(currentRow);
             }
+            reader.Close();
             return currentRow;
         }
 
@@ -49,6 +50,7 @@ namespace Shared.Data
                 Array.Resize(ref returnRows, returnRows.Length + 1);
                 returnRows[returnRows.GetUpperBound(0)] = currentRow;
             }
+            reader.Close();
             return returnRows;
         }
 

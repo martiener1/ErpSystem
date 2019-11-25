@@ -19,7 +19,7 @@ namespace StockAPI.DataAccess
 
         public OrderDataAccessImplMySql()
         {
-            this.dbConnectionString = DatabaseConnectionString.GetAzureConnectionString("order");
+            this.dbConnectionString = DatabaseConnectionString.GetAzureConnectionString("`order`");
         }
 
         private MySqlConnection NewConnection()

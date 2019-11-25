@@ -141,6 +141,7 @@ namespace LoginAPI.DataAccess
         {
             string query = "delete from tokens where userid = @0;";
             await QueryExecutor.Delete(NewConnection(), query, MySqlDbType.Int32, userId);
+            CloseConnection();
         }
 
         private async Task<bool> NewToken(long userId, string newToken)

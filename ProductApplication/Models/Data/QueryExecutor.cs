@@ -27,7 +27,6 @@ namespace Shared.Data
             await connection.OpenAsync();
             MySqlCommand command = CreateMySqlCommand(connection, query, dataTypesAndValues);
             DbDataReader reader = await command.ExecuteReaderAsync();
-            await connection.CloseAsync();
             
             object[] currentRow = new object[reader.FieldCount];
             while (reader.Read())
@@ -35,6 +34,7 @@ namespace Shared.Data
                 reader.GetValues(currentRow);
             }
             reader.Close();
+            await connection.CloseAsync();
             return currentRow;
         }
 

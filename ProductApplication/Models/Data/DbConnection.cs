@@ -36,13 +36,12 @@ namespace Shared.Data
 
         public bool Connect(string connString)
         {
-            //connString = "server=localhost;port=3306;database=login;user=root;password=root";
             if (IsConnected())
             {
                 return false;
             }
             connection = new MySqlConnection(connString);
-            connection.Open();
+            //connection.Open();
             return true;
 
         }

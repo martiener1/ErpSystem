@@ -32,7 +32,7 @@ namespace LoginAPI.DataAccess
 
         private void CloseConnection()
         {
-            DBConnection.Instance().Close();
+            //DBConnection.Instance().Close();
         }
 
         public async Task<bool> AreCredentialsOk(string username, string password)

@@ -24,8 +24,10 @@ namespace Shared.Data
         public static async Task<object[]> SelectSingle(MySqlConnection connection, string query, params object[] dataTypesAndValues)
         {
             // usage : SelectSingle(connection, "SELECT * FROM table WHERE city = @0 AND name = @1", MySqlDbType.VarChar, "cityName", MySqlDbType.VarChar, "name");
+            await connection.OpenAsync();
             MySqlCommand command = CreateMySqlCommand(connection, query, dataTypesAndValues);
             DbDataReader reader = await command.ExecuteReaderAsync();
+            await connection.CloseAsync();
             
             object[] currentRow = new object[reader.FieldCount];
             while (reader.Read())

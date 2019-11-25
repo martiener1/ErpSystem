@@ -23,7 +23,7 @@ namespace LoginAPI.DataAccess
             this.dbConnectionString = DatabaseConnectionString.GetAzureConnectionString("login");
         }
 
-        private MySqlConnection NewConnection()
+        private MySqlConnection NewConnection() 
         {
             DBConnection dbCon = DBConnection.Instance();
             dbCon.Connect(dbConnectionString);

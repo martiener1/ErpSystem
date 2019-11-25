@@ -31,7 +31,7 @@ namespace ProductAPI.DataAccess
 
         private void CloseConnection()
         {
-            DBConnection.Instance().Close();
+            //DBConnection.Instance().Close();
         }
 
         public async Task<Product> AddNewProduct(int storeId, Product product)

@@ -37,7 +37,7 @@ namespace Testing.IntegrationTesting
 
         public void CloseConnection()
         {
-            DBConnection.Instance().Close();
+            //DBConnection.Instance().Close();
         }
     }
 }

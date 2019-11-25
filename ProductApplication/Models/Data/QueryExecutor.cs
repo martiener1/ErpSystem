@@ -41,6 +41,7 @@ namespace Shared.Data
         public static async Task<object[][]> SelectMultiple(MySqlConnection connection, string query, params object[] dataTypesAndValues)
         {
             // usage : SelectMultiple(connection, "SELECT * FROM table WHERE city = @0 AND name = @1", MySqlDbType.VarChar, "cityName", MySqlDbType.VarChar, "name");
+            await connection.OpenAsync();
             MySqlCommand command = CreateMySqlCommand(connection, query, dataTypesAndValues);
             DbDataReader reader = await command.ExecuteReaderAsync();
 
@@ -53,6 +54,7 @@ namespace Shared.Data
                 returnRows[returnRows.GetUpperBound(0)] = currentRow;
             }
             reader.Close();
+            await connection.CloseAsync();
             return returnRows;
         }
 
@@ -79,8 +81,10 @@ namespace Shared.Data
 
         private static async Task<int> ExecuteNonQuery(MySqlConnection connection, string query, params object[] dataTypesAndValues)
         {
+            await connection.OpenAsync();
             MySqlCommand command = CreateMySqlCommand(connection, query, dataTypesAndValues);
             int rowsAffected = await command.ExecuteNonQueryAsync();
+            await connection.CloseAsync();
             return rowsAffected;
         }
 }

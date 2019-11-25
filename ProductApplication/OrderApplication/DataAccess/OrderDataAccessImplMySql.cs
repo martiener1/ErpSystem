@@ -31,7 +31,7 @@ namespace StockAPI.DataAccess
 
         private void CloseConnection()
         {
-            DBConnection.Instance().Close();
+            //DBConnection.Instance().Close();
         }
 
         public async Task<bool> ChangeNextOrder(int storeId, long productId, int amount)

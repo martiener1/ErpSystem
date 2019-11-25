@@ -32,7 +32,7 @@ namespace StockAPI.DataAccess
 
         private void CloseConnection()
         {
-            DBConnection.Instance().Close();
+            //DBConnection.Instance().Close();
         }
 
         public async Task AddMutation(int storeId, StockMutation stockMutation)

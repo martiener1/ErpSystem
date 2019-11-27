@@ -29,6 +29,20 @@ namespace ProductAPI.DataAccess
             return dbCon.Connection;
         }
 
+        public MySqlConnection GetConnection()
+        {
+            DBConnection dbCon = DBConnection.Instance();
+            MySqlConnection connection = dbCon.Connection;
+            if (connection != null)
+            {
+                return connection;
+            }
+            else
+            {
+                return NewConnection();
+            }
+        }
+
         private void CloseConnection()
         {
             //DBConnection.Instance().Close();
@@ -72,7 +86,7 @@ namespace ProductAPI.DataAccess
         public async Task<Product> GetProductByEAN(int selectStoreId, string selectEuropeanArticleNumber)
         {
             string query = "Select * from product where storeid = @0 and europeanArticleNumber = @1;";
-            object[] row = await QueryExecutor.SelectSingle(NewConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.VarChar, selectEuropeanArticleNumber);
+            object[] row = await QueryExecutor.SelectSingle(GetConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.VarChar, selectEuropeanArticleNumber);
             CloseConnection();
             if (row[0] == null) return null; // empty record
             int id = (int)row[0];
@@ -94,7 +108,7 @@ namespace ProductAPI.DataAccess
         public async Task<Product> GetProductById(int selectStoreId, long selectId)
         {
             string query = "Select * from product where storeid = @0 and id = @1;";
-            object[] row = await QueryExecutor.SelectSingle(NewConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectId);
+            object[] row = await QueryExecutor.SelectSingle(GetConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectId);
             CloseConnection();
             if (row[0] == null) return null; // empty record
             int id = (int)row[0];
@@ -116,7 +130,7 @@ namespace ProductAPI.DataAccess
         public async Task<Product> GetProductByProductNumber(int selectStoreId, string selectProductNumber)
         {
             string query = "Select * from product where storeid = @0 and productNumber = @1;";
-            object[] row = await QueryExecutor.SelectSingle(NewConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.VarChar, selectProductNumber);
+            object[] row = await QueryExecutor.SelectSingle(GetConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.VarChar, selectProductNumber);
             CloseConnection();
             if (row[0] == null) return null; // empty record
             int id = (int)row[0];
@@ -138,7 +152,7 @@ namespace ProductAPI.DataAccess
         private async Task<ProductGroup> GetProductGroup(int selectStoreId, int selectGroupId)
         {
             string query = "select `id`, `categoryId`, `name` from `group` where storeId = @0 and id = @1;";
-            object[] row = await QueryExecutor.SelectSingle(NewConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectGroupId);
+            object[] row = await QueryExecutor.SelectSingle(GetConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectGroupId);
             CloseConnection();
             if (row[0] == null) return null; // empty record
             int id = (int)row[0];
@@ -152,7 +166,7 @@ namespace ProductAPI.DataAccess
         private async Task<ProductCategory> GetProductCategory(int selectStoreId, int selectCategoryId)
         {
             string query = "select id, `name` from category where storeId = @0 and id = @1;";
-            object[] row = await QueryExecutor.SelectSingle(NewConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectCategoryId);
+            object[] row = await QueryExecutor.SelectSingle(GetConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectCategoryId);
             CloseConnection();
             if (row[0] == null) return null; // empty record
             int id = (int)row[0];

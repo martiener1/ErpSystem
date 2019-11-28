@@ -116,10 +116,10 @@
 
             <Button
                 android:id="@+id/btnStockMutation"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="onBtnMutationClick"
-                android:text="Mutation" />
+                android:onClick="onBtnSaveNextOrder"
+                android:text="New Mutation" />
         </LinearLayout>
 
         <LinearLayout
@@ -140,7 +140,15 @@
                 android:id="@+id/inputNextOrder"
                 android:layout_width="48dp"
                 android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
                 android:inputType="number" />
+
+            <Button
+                android:id="@+id/btnSaveNextOrder"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onClick="onBtnMutationClick"
+                android:text="Save" />
         </LinearLayout>
 
         <LinearLayout

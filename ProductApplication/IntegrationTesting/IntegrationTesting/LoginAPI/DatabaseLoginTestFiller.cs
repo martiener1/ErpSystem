@@ -9,12 +9,11 @@ namespace Testing.IntegrationTesting.LoginAPI
 {
     class DatabaseLoginTestFiller
     {
-        private DatabaseAccess dbAccess;
+        string connectionString;
 
         public DatabaseLoginTestFiller()
         {
-            string connectionString = DatabaseConnectionString.GetAzureConnectionString("logintest");
-            dbAccess = new DatabaseAccess(connectionString);
+            connectionString = DatabaseConnectionString.GetAzureConnectionString("logintest");
         }
 
         public static async Task EmptyAndFillDatabases()
@@ -29,12 +28,10 @@ namespace Testing.IntegrationTesting.LoginAPI
             string queryTruncateTokens = "truncate tokens;";
             string queryTruncateUsers = "truncate users;";
             string queryTruncateStores = "truncate stores;";
-
-            MySqlConnection mySqlConnection = dbAccess.NewConnection();
-            await QueryExecutor.Delete(mySqlConnection, queryTruncateTokens);
-            await QueryExecutor.Delete(mySqlConnection, queryTruncateUsers);
-            await QueryExecutor.Delete(mySqlConnection, queryTruncateStores);
-            dbAccess.CloseConnection();
+            
+            await QueryExecutor.Delete(connectionString, queryTruncateTokens);
+            await QueryExecutor.Delete(connectionString, queryTruncateUsers);
+            await QueryExecutor.Delete(connectionString, queryTruncateStores);
         }
 
         private async Task FillDatabaseTablesWithDummyData()
@@ -46,16 +43,14 @@ namespace Testing.IntegrationTesting.LoginAPI
             string queryInsertToken1 = "INSERT INTO `tokens` (`id`, `userid`, `token`, `expirationdate`) VALUES ('1', '1', 'token1', ADDTIME(now(), '00:30:00'));";
             string queryInsertToken2 = "INSERT INTO `tokens` (`id`, `userid`, `token`, `expirationdate`) VALUES ('2', '2', 'token2', ADDTIME(now(), '00:30:00'));";
             string queryInsertToken3 = "INSERT INTO `tokens` (`id`, `userid`, `token`, `expirationdate`) VALUES ('3', '3', 'token3', SUBTIME(now(), '00:30:00'));";
-
-            MySqlConnection mySqlConnection = dbAccess.NewConnection();
-            await QueryExecutor.Insert(mySqlConnection, queryInsertStore);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertUser1);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertUser2);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertUser3);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertToken1);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertToken2);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertToken3);
-            dbAccess.CloseConnection();
+            
+            await QueryExecutor.Insert(connectionString, queryInsertStore);
+            await QueryExecutor.Insert(connectionString, queryInsertUser1);
+            await QueryExecutor.Insert(connectionString, queryInsertUser2);
+            await QueryExecutor.Insert(connectionString, queryInsertUser3);
+            await QueryExecutor.Insert(connectionString, queryInsertToken1);
+            await QueryExecutor.Insert(connectionString, queryInsertToken2);
+            await QueryExecutor.Insert(connectionString, queryInsertToken3);
         }
     }
 }

@@ -40,42 +40,27 @@ namespace Shared.Data
             }
         }
 
-
-        public static async Task<object[]> SelectSingle(MySqlConnection connection, string query, params object[] dataTypesAndValues)
-        {
-            // usage : SelectSingle(connection, "SELECT * FROM table WHERE city = @0 AND name = @1", MySqlDbType.VarChar, "cityName", MySqlDbType.VarChar, "name");
-            await connection.OpenAsync();
-            MySqlCommand command = CreateMySqlCommand(connection, query, dataTypesAndValues);
-            DbDataReader reader = await command.ExecuteReaderAsync();
-            
-            object[] currentRow = new object[reader.FieldCount];
-            while (reader.Read())
-            {
-                reader.GetValues(currentRow);
-            }
-            reader.Close();
-            await connection.CloseAsync();
-            return currentRow;
-        }
-
-        public static async Task<object[][]> SelectMultiple(MySqlConnection connection, string query, params object[] dataTypesAndValues)
+        public static async Task<object[][]> SelectMultiple(String connectionString, string query, params object[] dataTypesAndValues)
         {
             // usage : SelectMultiple(connection, "SELECT * FROM table WHERE city = @0 AND name = @1", MySqlDbType.VarChar, "cityName", MySqlDbType.VarChar, "name");
-            await connection.OpenAsync();
-            MySqlCommand command = CreateMySqlCommand(connection, query, dataTypesAndValues);
-            DbDataReader reader = await command.ExecuteReaderAsync();
-
-            object[][] returnRows = new object[0][];
-            while (reader.Read())
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                object[] currentRow = new object[reader.FieldCount];
-                reader.GetValues(currentRow);
-                Array.Resize(ref returnRows, returnRows.Length + 1);
-                returnRows[returnRows.GetUpperBound(0)] = currentRow;
+                await connection.OpenAsync();
+                MySqlCommand command = CreateMySqlCommand(connection, query, dataTypesAndValues);
+                DbDataReader reader = await command.ExecuteReaderAsync();
+
+                object[][] returnRows = new object[0][];
+                while (reader.Read())
+                {
+                    object[] currentRow = new object[reader.FieldCount];
+                    reader.GetValues(currentRow);
+                    Array.Resize(ref returnRows, returnRows.Length + 1);
+                    returnRows[returnRows.GetUpperBound(0)] = currentRow;
+                }
+                reader.Close();
+                await connection.CloseAsync();
+                return returnRows;
             }
-            reader.Close();
-            await connection.CloseAsync();
-            return returnRows;
         }
 
         public static async Task<int> Update(String connectionString, string query, params object[] dataTypesAndValues)
@@ -83,19 +68,9 @@ namespace Shared.Data
             return await ExecuteNonQuery(connectionString, query, dataTypesAndValues);
         }
 
-        public static async Task<int> Update(MySqlConnection connection, string query, params object[] dataTypesAndValues)
-        {
-            return await ExecuteNonQuery(connection, query, dataTypesAndValues);
-        }
-
         public static async Task<int> Delete(String connectionString, string query, params object[] dataTypesAndValues)
         {
             return await ExecuteNonQuery(connectionString, query, dataTypesAndValues);
-        }
-
-        public static async Task<int> Delete(MySqlConnection connection, string query, params object[] dataTypesAndValues)
-        {
-            return await ExecuteNonQuery(connection, query, dataTypesAndValues);
         }
 
         public static async Task<int> Insert(String connectionString, string query, params object[] dataTypesAndValues)
@@ -103,21 +78,10 @@ namespace Shared.Data
             return await ExecuteNonQuery(connectionString, query, dataTypesAndValues);
         }
 
-        public static async Task<int> Insert(MySqlConnection connection, string query, params object[] dataTypesAndValues)
-        {
-            return await ExecuteNonQuery(connection, query, dataTypesAndValues);
-        }
-
         public static async Task Truncate(String connectionString, string query)
         {
             //TODO: Maybe find a way so only test databases can be truncated/wiped
             await ExecuteNonQuery(connectionString, query);
-        }
-
-        public static async Task Truncate(MySqlConnection connection, string query)
-        {
-            //TODO: Maybe find a way so only test databases can be truncated/wiped
-            await ExecuteNonQuery(connection, query);
         }
 
         private static async Task<int> ExecuteNonQuery(String connectionString, string query, params object[] dataTypesAndValues)
@@ -131,14 +95,5 @@ namespace Shared.Data
                 return rowsAffected;
             }
         }
-
-        private static async Task<int> ExecuteNonQuery(MySqlConnection connection, string query, params object[] dataTypesAndValues)
-        {
-            await connection.OpenAsync();
-            MySqlCommand command = CreateMySqlCommand(connection, query, dataTypesAndValues);
-            int rowsAffected = await command.ExecuteNonQueryAsync();
-            await connection.CloseAsync();
-            return rowsAffected;
-        }
-}
+    }
 }

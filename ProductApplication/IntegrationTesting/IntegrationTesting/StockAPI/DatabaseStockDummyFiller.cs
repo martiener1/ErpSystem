@@ -9,12 +9,11 @@ namespace Testing.IntegrationTesting.StockAPI
 {
     class DatabaseStockDummyFiller
     {
-        private DatabaseAccess dbAccess;
+        string connectionString;
 
         public DatabaseStockDummyFiller()
         {
-            string connectionString = DatabaseConnectionString.GetAzureConnectionString("stocktest");
-            dbAccess = new DatabaseAccess(connectionString);
+            connectionString = DatabaseConnectionString.GetAzureConnectionString("stocktest");
         }
 
         public static async Task EmptyAndFillDatabases()
@@ -28,11 +27,9 @@ namespace Testing.IntegrationTesting.StockAPI
         {
             string queryTruncateStock = "truncate `stock`;";
             string queryTruncateStockMutation = "truncate `stockmutation`;";
-
-            MySqlConnection mySqlConnection = dbAccess.NewConnection();
-            await QueryExecutor.Truncate(mySqlConnection, queryTruncateStock);
-            await QueryExecutor.Truncate(mySqlConnection, queryTruncateStockMutation);
-            dbAccess.CloseConnection();
+            
+            await QueryExecutor.Truncate(connectionString, queryTruncateStock);
+            await QueryExecutor.Truncate(connectionString, queryTruncateStockMutation);
         }
 
         private async Task FillDatabaseTablesWithDummyData()
@@ -44,14 +41,12 @@ namespace Testing.IntegrationTesting.StockAPI
             string queryInsertStockMutation4 = "INSERT INTO `stockmutation` (`id`, `storeId`, `productId`, `amount`, `reason`, `datetime`) VALUES ('4', '1', '1', '10', 'Bought', subtime(now(), '6 00:00:00'));";
             string queryInsertStockMutation5 = "INSERT INTO `stockmutation` (`id`, `storeId`, `productId`, `amount`, `reason`, `datetime`) VALUES ('5', '1', '1', '-4', 'Sold', subtime(now(), '4 00:00:00'));";
             
-            MySqlConnection mySqlConnection = dbAccess.NewConnection();
-            await QueryExecutor.Insert(mySqlConnection, queryInsertStock);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertStockMutation1);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertStockMutation2);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertStockMutation3);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertStockMutation4);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertStockMutation5);
-            dbAccess.CloseConnection();
+            await QueryExecutor.Insert(connectionString, queryInsertStock);
+            await QueryExecutor.Insert(connectionString, queryInsertStockMutation1);
+            await QueryExecutor.Insert(connectionString, queryInsertStockMutation2);
+            await QueryExecutor.Insert(connectionString, queryInsertStockMutation3);
+            await QueryExecutor.Insert(connectionString, queryInsertStockMutation4);
+            await QueryExecutor.Insert(connectionString, queryInsertStockMutation5);
         }
     }
 }

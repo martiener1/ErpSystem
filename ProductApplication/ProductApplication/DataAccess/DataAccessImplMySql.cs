@@ -22,32 +22,6 @@ namespace ProductAPI.DataAccess
             this.dbConnectionString = DatabaseConnectionString.GetAzureConnectionString("product");
         }
 
-        private MySqlConnection NewConnection()
-        {
-            DBConnection dbCon = DBConnection.Instance();
-            dbCon.Connect(dbConnectionString);
-            return dbCon.Connection;
-        }
-
-        public MySqlConnection GetConnection()
-        {
-            DBConnection dbCon = DBConnection.Instance();
-            MySqlConnection connection = dbCon.Connection;
-            if (connection != null)
-            {
-                return connection;
-            }
-            else
-            {
-                return NewConnection();
-            }
-        }
-
-        private void CloseConnection()
-        {
-            //DBConnection.Instance().Close();
-        }
-
         public async Task<Product> AddNewProduct(int storeId, Product product)
         {
             /* THIS METHOD WILL NOT BE USED IN THE POC
@@ -86,8 +60,7 @@ namespace ProductAPI.DataAccess
         public async Task<Product> GetProductByEAN(int selectStoreId, string selectEuropeanArticleNumber)
         {
             string query = "Select * from product where storeid = @0 and europeanArticleNumber = @1;";
-            object[] row = await QueryExecutor.SelectSingle(GetConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.VarChar, selectEuropeanArticleNumber);
-            CloseConnection();
+            object[] row = await QueryExecutor.SelectSingle(dbConnectionString, query, MySqlDbType.Int32, selectStoreId, MySqlDbType.VarChar, selectEuropeanArticleNumber);
             if (row[0] == null) return null; // empty record
             int id = (int)row[0];
             int storeId = (int)row[1];
@@ -108,8 +81,7 @@ namespace ProductAPI.DataAccess
         public async Task<Product> GetProductById(int selectStoreId, long selectId)
         {
             string query = "Select * from product where storeid = @0 and id = @1;";
-            object[] row = await QueryExecutor.SelectSingle(GetConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectId);
-            CloseConnection();
+            object[] row = await QueryExecutor.SelectSingle(dbConnectionString, query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectId);
             if (row[0] == null) return null; // empty record
             int id = (int)row[0];
             int storeId = (int)row[1];
@@ -130,8 +102,7 @@ namespace ProductAPI.DataAccess
         public async Task<Product> GetProductByProductNumber(int selectStoreId, string selectProductNumber)
         {
             string query = "Select * from product where storeid = @0 and productNumber = @1;";
-            object[] row = await QueryExecutor.SelectSingle(GetConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.VarChar, selectProductNumber);
-            CloseConnection();
+            object[] row = await QueryExecutor.SelectSingle(dbConnectionString, query, MySqlDbType.Int32, selectStoreId, MySqlDbType.VarChar, selectProductNumber);
             if (row[0] == null) return null; // empty record
             int id = (int)row[0];
             int storeId = (int)row[1];
@@ -152,8 +123,7 @@ namespace ProductAPI.DataAccess
         private async Task<ProductGroup> GetProductGroup(int selectStoreId, int selectGroupId)
         {
             string query = "select `id`, `categoryId`, `name` from `group` where storeId = @0 and id = @1;";
-            object[] row = await QueryExecutor.SelectSingle(GetConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectGroupId);
-            CloseConnection();
+            object[] row = await QueryExecutor.SelectSingle(dbConnectionString, query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectGroupId);
             if (row[0] == null) return null; // empty record
             int id = (int)row[0];
             int categoryId = (int)row[1];
@@ -166,8 +136,7 @@ namespace ProductAPI.DataAccess
         private async Task<ProductCategory> GetProductCategory(int selectStoreId, int selectCategoryId)
         {
             string query = "select id, `name` from category where storeId = @0 and id = @1;";
-            object[] row = await QueryExecutor.SelectSingle(GetConnection(), query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectCategoryId);
-            CloseConnection();
+            object[] row = await QueryExecutor.SelectSingle(dbConnectionString, query, MySqlDbType.Int32, selectStoreId, MySqlDbType.Int32, selectCategoryId);
             if (row[0] == null) return null; // empty record
             int id = (int)row[0];
             string name = (string)row[1];

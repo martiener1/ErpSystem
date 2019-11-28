@@ -9,12 +9,11 @@ namespace Testing.IntegrationTesting.OrderAPI
 {
     class DatabaseOrderDummyFiller
     {
-        private DatabaseAccess dbAccess;
+        string connectionString;
 
         public DatabaseOrderDummyFiller()
         {
-            string connectionString = DatabaseConnectionString.GetAzureConnectionString("ordertest"); ;
-            dbAccess = new DatabaseAccess(connectionString);
+            connectionString = DatabaseConnectionString.GetAzureConnectionString("ordertest");
         }
 
         public static async Task EmptyAndFillDatabases()
@@ -28,18 +27,14 @@ namespace Testing.IntegrationTesting.OrderAPI
         {
             string queryTruncateNextOrder = "truncate `nextorder`;";
             
-            MySqlConnection mySqlConnection = dbAccess.NewConnection();
-            await QueryExecutor.Truncate(mySqlConnection, queryTruncateNextOrder);
-            dbAccess.CloseConnection();
+            await QueryExecutor.Truncate(connectionString, queryTruncateNextOrder);
         }
 
         private async Task FillDatabaseTablesWithDummyData()
         {
             string queryInsertNextOrder = "INSERT INTO `nextorder` (`id`, `storeId`, `productId`, `amount`) VALUES ('1', '1', '1', '10');";
             
-            MySqlConnection mySqlConnection = dbAccess.NewConnection();
-            await QueryExecutor.Insert(mySqlConnection, queryInsertNextOrder);
-            dbAccess.CloseConnection();
+            await QueryExecutor.Insert(connectionString, queryInsertNextOrder);
         }
     }
 }

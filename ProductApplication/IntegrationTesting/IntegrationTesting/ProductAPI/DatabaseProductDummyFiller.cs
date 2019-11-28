@@ -9,12 +9,11 @@ namespace Testing.IntegrationTesting.LoginAPI
 {
     class DatabaseProductDummyFiller
     {
-        private DatabaseAccess dbAccess;
+        string connectionString;
 
         public DatabaseProductDummyFiller()
         {
-            string connectionString = DatabaseConnectionString.GetAzureConnectionString("producttest");
-            dbAccess = new DatabaseAccess(connectionString);
+            connectionString = DatabaseConnectionString.GetAzureConnectionString("producttest");
         }
 
         public static async Task EmptyAndFillDatabases()
@@ -30,13 +29,10 @@ namespace Testing.IntegrationTesting.LoginAPI
             string queryTruncateProducts = "truncate `product`;";
             string queryTruncateGroups = "truncate `group`;";
             string queryTruncateCategories = "truncate `category`;";
-
-
-            MySqlConnection mySqlConnection = dbAccess.NewConnection();
-            await QueryExecutor.Truncate(mySqlConnection, queryTruncateProducts);
-            await QueryExecutor.Truncate(mySqlConnection, queryTruncateGroups);
-            await QueryExecutor.Truncate(mySqlConnection, queryTruncateCategories);
-            dbAccess.CloseConnection();
+            
+            await QueryExecutor.Truncate(connectionString, queryTruncateProducts);
+            await QueryExecutor.Truncate(connectionString, queryTruncateGroups);
+            await QueryExecutor.Truncate(connectionString, queryTruncateCategories);
         }
 
         private async Task FillDatabaseTablesWithDummyData()
@@ -47,13 +43,11 @@ namespace Testing.IntegrationTesting.LoginAPI
             string queryInsertProduct1 = "INSERT INTO `product` (`id`, `storeId`, `groupId`, `name`, `brand`, `buyingPrice`, `sellingPrice`, `supplier`, `productNumber`, `europeanArticleNumber`) VALUES ('1', '1', '1', 'name1', 'brand1', '1.00', '2.50', 'supplier1', '123456', '8718123456721');";
             string queryInsertProduct2 = "INSERT INTO `product` (`id`, `storeId`, `groupId`, `name`, `brand`, `buyingPrice`, `sellingPrice`, `supplier`, `productNumber`, `europeanArticleNumber`) VALUES ('2', '1', '2', 'name2', 'brand2', '2.00', '4.50', 'supplier2', '654321', '1234554321');";
             
-            MySqlConnection mySqlConnection = dbAccess.NewConnection();
-            await QueryExecutor.Insert(mySqlConnection, queryInsertCategory);
-            await QueryExecutor.Insert(mySqlConnection, queryInstertGroup1);
-            await QueryExecutor.Insert(mySqlConnection, queryInstertGroup2);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertProduct1);
-            await QueryExecutor.Insert(mySqlConnection, queryInsertProduct2);
-            dbAccess.CloseConnection();
+            await QueryExecutor.Insert(connectionString, queryInsertCategory);
+            await QueryExecutor.Insert(connectionString, queryInstertGroup1);
+            await QueryExecutor.Insert(connectionString, queryInstertGroup2);
+            await QueryExecutor.Insert(connectionString, queryInsertProduct1);
+            await QueryExecutor.Insert(connectionString, queryInsertProduct2);
         }
     }
 }

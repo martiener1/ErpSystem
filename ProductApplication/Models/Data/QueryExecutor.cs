@@ -78,9 +78,19 @@ namespace Shared.Data
             return returnRows;
         }
 
+        public static async Task<int> Update(String connectionString, string query, params object[] dataTypesAndValues)
+        {
+            return await ExecuteNonQuery(connectionString, query, dataTypesAndValues);
+        }
+
         public static async Task<int> Update(MySqlConnection connection, string query, params object[] dataTypesAndValues)
         {
             return await ExecuteNonQuery(connection, query, dataTypesAndValues);
+        }
+
+        public static async Task<int> Delete(String connectionString, string query, params object[] dataTypesAndValues)
+        {
+            return await ExecuteNonQuery(connectionString, query, dataTypesAndValues);
         }
 
         public static async Task<int> Delete(MySqlConnection connection, string query, params object[] dataTypesAndValues)
@@ -88,15 +98,38 @@ namespace Shared.Data
             return await ExecuteNonQuery(connection, query, dataTypesAndValues);
         }
 
+        public static async Task<int> Insert(String connectionString, string query, params object[] dataTypesAndValues)
+        {
+            return await ExecuteNonQuery(connectionString, query, dataTypesAndValues);
+        }
+
         public static async Task<int> Insert(MySqlConnection connection, string query, params object[] dataTypesAndValues)
         {
             return await ExecuteNonQuery(connection, query, dataTypesAndValues);
+        }
+
+        public static async Task Truncate(String connectionString, string query)
+        {
+            //TODO: Maybe find a way so only test databases can be truncated/wiped
+            await ExecuteNonQuery(connectionString, query);
         }
 
         public static async Task Truncate(MySqlConnection connection, string query)
         {
             //TODO: Maybe find a way so only test databases can be truncated/wiped
             await ExecuteNonQuery(connection, query);
+        }
+
+        private static async Task<int> ExecuteNonQuery(String connectionString, string query, params object[] dataTypesAndValues)
+        {
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                MySqlCommand command = CreateMySqlCommand(connection, query, dataTypesAndValues);
+                int rowsAffected = await command.ExecuteNonQueryAsync();
+                await connection.CloseAsync();
+                return rowsAffected;
+            }
         }
 
         private static async Task<int> ExecuteNonQuery(MySqlConnection connection, string query, params object[] dataTypesAndValues)

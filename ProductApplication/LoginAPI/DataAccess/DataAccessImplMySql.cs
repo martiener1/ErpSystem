@@ -22,7 +22,7 @@ namespace LoginAPI.DataAccess
         {
             this.dbConnectionString = DatabaseConnectionString.GetAzureConnectionString("login");
         }
-
+        /*
         private MySqlConnection NewConnection() 
         {
             DBConnection dbCon = DBConnection.Instance();
@@ -43,7 +43,7 @@ namespace LoginAPI.DataAccess
                 return NewConnection();
             }
         }
-
+        */
         private void CloseConnection()
         {
             //DBConnection.Instance().Close();
@@ -140,7 +140,7 @@ namespace LoginAPI.DataAccess
         public async Task<bool> RefreshToken(string token)
         {
             string query = "UPDATE tokens SET expirationdate = ADDTIME(now(), '00:30:00') WHERE token = @0 and expirationdate > now();";
-            int rowsAffected = await QueryExecutor.Update(GetConnection(), query, MySqlDbType.VarChar, token);
+            int rowsAffected = await QueryExecutor.Update(dbConnectionString, query, MySqlDbType.VarChar, token);
             CloseConnection();
             return rowsAffected > 0;
         }
@@ -154,14 +154,14 @@ namespace LoginAPI.DataAccess
         private async Task DeleteTokens(long userId)
         {
             string query = "delete from tokens where userid = @0;";
-            await QueryExecutor.Delete(GetConnection(), query, MySqlDbType.Int32, userId);
+            await QueryExecutor.Delete(dbConnectionString, query, MySqlDbType.Int32, userId);
             CloseConnection();
         }
 
         private async Task<bool> NewToken(long userId, string newToken)
         {
             string query = "insert into tokens (userid, token, expirationdate) values (@0, @1, ADDTIME(now(), '00:30:00'));";
-            int rowsAffected = await QueryExecutor.Insert(GetConnection(), query, MySqlDbType.Int32, userId, MySqlDbType.VarChar, newToken);
+            int rowsAffected = await QueryExecutor.Insert(dbConnectionString, query, MySqlDbType.Int32, userId, MySqlDbType.VarChar, newToken);
             CloseConnection();
             return rowsAffected > 0;
         }
@@ -169,7 +169,7 @@ namespace LoginAPI.DataAccess
         public async Task SetTokenExpired(string token)
         {
             string query = "UPDATE tokens SET expirationdate = now() WHERE token = @0 and expirationdate > now();";
-            await QueryExecutor.Update(GetConnection(), query, MySqlDbType.VarChar, token);
+            await QueryExecutor.Update(dbConnectionString, query, MySqlDbType.VarChar, token);
             CloseConnection();
         }
     }

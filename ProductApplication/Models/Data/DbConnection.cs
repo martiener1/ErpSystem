@@ -49,6 +49,7 @@ namespace Shared.Data
         public void Close()
         {
             connection.Close();
+            connection.Dispose();
             connection = null;
         }
     }

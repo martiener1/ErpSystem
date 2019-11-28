@@ -21,6 +21,26 @@ namespace Shared.Data
             return command;
         }
 
+        public static async Task<object[]> SelectSingle(string connectionString, string query, params object[] dataTypesAndValues)
+        {
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                await connection.OpenAsync();
+                MySqlCommand command = CreateMySqlCommand(connection, query, dataTypesAndValues);
+                DbDataReader reader = await command.ExecuteReaderAsync();
+
+                object[] currentRow = new object[reader.FieldCount];
+                while (reader.Read())
+                {
+                    reader.GetValues(currentRow);
+                }
+                reader.Close();
+                await connection.CloseAsync();
+                return currentRow;
+            }
+        }
+
+
         public static async Task<object[]> SelectSingle(MySqlConnection connection, string query, params object[] dataTypesAndValues)
         {
             // usage : SelectSingle(connection, "SELECT * FROM table WHERE city = @0 AND name = @1", MySqlDbType.VarChar, "cityName", MySqlDbType.VarChar, "name");

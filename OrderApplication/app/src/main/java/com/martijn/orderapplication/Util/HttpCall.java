@@ -21,19 +21,6 @@ public class HttpCall {
     private static final MediaType json
             = MediaType.get("application/json; charset=utf-8");
 
-    public static Response getData(String url) {
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        try  {
-            Response response = client.newCall(request).execute();
-            return response;
-        } catch(Exception ex) {
-            Log.println(Log.ERROR, "tag", "Message is:  " + ex.toString());
-            return null;
-        }
-    }
-
     public static void getDataAsync(String url, Callback callback) {
         Request request = new Request.Builder()
                 .url(url)
@@ -54,17 +41,26 @@ public class HttpCall {
         call.enqueue(callback);
     }
 
-    public static Response getData(String url, String token) {
+    public static void postDataAsync(String url, String jsonBody, String token, Callback callback) {
+        RequestBody body = RequestBody.create(json, jsonBody);
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("token", token)
+                .post(body)
                 .build();
-        try  {
-            Response response = client.newCall(request).execute();
-            return response;
-        } catch(Exception ex) {
-            return null;
-        }
+        Call call = client.newCall(request);
+        call.enqueue(callback);
+    }
+
+    public static void putDataAsync(String url, String jsonBody, String token, Callback callback) {
+        RequestBody body = RequestBody.create(json, jsonBody);
+        Request request = new Request.Builder()
+                .url(url)
+                .addHeader("token", token)
+                .put(body)
+                .build();
+        Call call = client.newCall(request);
+        call.enqueue(callback);
     }
 
     public static Response postData(String url, String jsonBody) {

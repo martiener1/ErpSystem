@@ -118,7 +118,7 @@
                 android:id="@+id/btnStockMutation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="onBtnSaveNextOrder"
+                android:onClick="onBtnMutationClick"
                 android:text="New Mutation" />
         </LinearLayout>
 
@@ -147,7 +147,7 @@
                 android:id="@+id/btnSaveNextOrder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="onBtnMutationClick"
+                android:onClick="onBtnSaveNextOrder"
                 android:text="Save" />
         </LinearLayout>
 

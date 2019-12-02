@@ -1,9 +1,6 @@
 package com.martijn.orderapplication;
 
-import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.support.annotation.ColorRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +20,7 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.martijn.orderapplication.Models.Product;
+import com.martijn.orderapplication.Models.StockMutation;
 import com.martijn.orderapplication.Util.ApiCaller;
 
 import org.jetbrains.annotations.NotNull;
@@ -46,12 +44,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onBtnGoClick(View v) {
-        setButtonGoEnable(false);
         String barcodeOrProductNumber = ((EditText)findViewById(R.id.inputProduct)).getText().toString();
         getProductByProductnumberOrBarcode(barcodeOrProductNumber);
     }
 
+    public void onBtnScanClick(View v) {
+        // currently not implemented
+        displayWarningMessage("Not yet implemented");
+    }
+
+    public void onBtnMutationClick(View v) {
+        displayWarningMessage("Not yet implemented");
+        // currently not implemented
+        // should give an pop-up where you can add a mutation
+        StockMutation stockMutation = new StockMutation();
+        saveNewMutation(stockMutation);
+    }
+
+    public void onBtnSaveNextOrder(View v) {
+        saveNextOrder();
+    }
+
+    public void onRadioButtonTypeSwitch(View v) {
+        calculateGraph(currentProduct.id);
+    }
+
+    public void onRadioButtonDurationSwtich(View v) {
+        calculateGraph(currentProduct.id);
+    }
+
     private void getProductByProductnumberOrBarcode(String barcodeOrProductNumber) {
+        setAllButtonsEnable(false);
         ApiCaller.GetProductByProductNumber(barcodeOrProductNumber, token , new Callback(){
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
@@ -64,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
                     displayProduct(currentProduct);
                 }
                 else if (responseCode == 401) {
-                    displayErrorMessage("Session timed out, please log in again, GetProductByProductNumber");
                     sendUserBackToLoginActitivy();
                 }
                 else if (responseCode == 404) {
@@ -74,12 +96,11 @@ public class MainActivity extends AppCompatActivity {
                 else {
                     displayErrorMessage("Unknown error occurred, GetProductByProductNumber");
                 }
-                setButtonGoEnable(true);
             }
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                setButtonGoEnable(true);
+                setAllButtonsEnable(true);
                 displayErrorMessage("Unknown error occurred, GetProductByProductNumber");
             }
         });
@@ -98,7 +119,6 @@ public class MainActivity extends AppCompatActivity {
                     currentProduct = product;
                 }
                 else if (responseCode == 401) {
-                    displayErrorMessage("Session timed out, please log in again, GetProductByBarcode");
                     sendUserBackToLoginActitivy();
                 }
                 else if (responseCode == 404) {
@@ -115,6 +135,10 @@ public class MainActivity extends AppCompatActivity {
                 displayErrorMessage("Unknown error occurred, GetProductByBarcode");
             }
         });
+    }
+
+    private void displayNormalMessage(String errorMessage) {
+        showPopUp(errorMessage, Log.VERBOSE);
     }
 
     private void displayWarningMessage(String errorMessage) {
@@ -175,18 +199,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void onBtnScanClick(View v) {
-        // currently not implemented
-        displayWarningMessage("Not yet implemented");
-    }
-
-    public void onBtnMutationClick(View v) {
-        displayWarningMessage("Not yet implemented");
-        // currently not implemented
-        // should give an pop-up where you can add a mutation
-    }
-
-    public void onBtnSaveNextOrder(View v) {
+    private void saveNextOrder() {
         EditText nextOrderTextView = (EditText)findViewById(R.id.inputNextOrder);
         int productId = currentProduct.id;
         int nextOrderAmount = Integer.parseInt(nextOrderTextView.getText().toString());
@@ -197,12 +210,13 @@ public class MainActivity extends AppCompatActivity {
                 int responseCode = response.code();
                 if (responseCode == 200) {
                     // success
+                    displayNormalMessage("NextOrder changed successfully");
                 }
                 else if (responseCode == 201) {
                     // did not exist, but it is created, success
+                    displayNormalMessage("NextOrder did not exist, created it successfully");
                 }
                 else if (responseCode == 401) {
-                    displayErrorMessage("Session timed out, please log in again, SaveNextOrder");
                     sendUserBackToLoginActitivy();
                 }
                 else {
@@ -217,15 +231,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void onRadioButtonTypeSwitch(View v) {
-        calculateGraph();
-    }
-
-    public void onRadioButtonDurationSwtich(View v) {
-        calculateGraph();
-    }
-
-    public void calculateGraph() {
+    public void calculateGraph(int productId) {
         int days;
         int selectedDuration = ((RadioGroup)findViewById(R.id.rgDuration)).getCheckedRadioButtonId();
 
@@ -241,14 +247,50 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         if (selectedType == R.id.rbStockHistory) {
-            //dataPoints = dataConnection.getStockHistory(currentProduct.id, days);
+            getAndRedrawStockHistoryGraph(productId, days);
         }
         else if (selectedType == R.id.rbMutationHistory) {
-            //dataPoints = dataConnection.getMutationHistory(currentProduct.id, days);
+            getAndRedrawMutationHistoryGraph(productId, days);
         }
         else return;
+    }
 
-        //redrawGraph(dataPoints);
+    private void getAndRedrawStockHistoryGraph(int productId, int durationInDays) {
+        setAllButtonsEnable(false);
+        ApiCaller.GetStockHistory(productId, durationInDays, token, new Callback(){
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                int responseCode = response.code();
+                if (responseCode == 200) {
+                    // success
+                    String json = response.body().string();
+                    int[] stockArray = (new Gson()).fromJson(json, int[].class);
+                    DataPoint[] dataPoints = new DataPoint[stockArray.length];
+                    for (int i = 0; i < stockArray.length; i++) {
+                        dataPoints[i] = new DataPoint(i, stockArray[i]);
+                    }
+                    redrawGraph(dataPoints);
+                }
+                else if (responseCode == 401) {
+                    sendUserBackToLoginActitivy();
+                }
+                else {
+                    displayErrorMessage("Unknown error occurred, GetStockHistory");
+                }
+                setAllButtonsEnable(true);
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                displayErrorMessage("Unknown error occurred, GetStockHistory");
+                setAllButtonsEnable(true);
+            }
+        });
+    }
+
+    private void getAndRedrawMutationHistoryGraph(int productId, int durationInDays) {
+        //TODO: this method
+        // Not for now, it might be useless for users
     }
 
     private void redrawGraph(DataPoint[] dataPoints) {
@@ -271,21 +313,47 @@ public class MainActivity extends AppCompatActivity {
                 ((TextView)findViewById(R.id.lblProductCategory)).setText(product.productGroup.productCategory.name);
             }
         });
-        getCurrentStock();
+        getAndDisplayCurrentStock(product.id);
         calculateAndDisplayNextOrder(product.id);
-        calculateGraph();
+        calculateGraph(product.id);
     }
 
-    private Integer getCurrentStock() {
+    private void getAndDisplayCurrentStock(int productId) {
         if (currentProduct != null) {
-            try {
-                //return dataConnection.getStock(currentProduct.id);
-            }
-            catch(Exception e){
-                return 66;
-            }
-        };
-        return 100;
+            // get currentStock
+            // display currentStock
+            ApiCaller.GetCurrentStock(productId, token, new Callback(){
+
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                    int responseCode = response.code();
+                    if (responseCode == 200) {
+                        // read response and change currentProduct
+                        int currentStockAmount = Integer.parseInt(response.body().string());
+                        setCurrentStockAmount(currentStockAmount);
+                    }
+                    else if (responseCode == 401) {
+                        sendUserBackToLoginActitivy();
+                    }
+                    else if (responseCode == 404) {
+                        // no currentStock found by productId
+                        setCurrentStockAmount(null);
+                        displayErrorMessage("Current stock could not be found or calculated");
+                    }
+                    else {
+                        setCurrentStockAmount(null);
+                        displayErrorMessage("Unknown error occurred, GetCurrentStock");
+                    }
+                }
+
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                    setCurrentStockAmount(null);
+                    displayErrorMessage("Unknown error occurred");
+                }
+            });
+        }
+
     }
 
     private void calculateAndDisplayNextOrder(int productId) {
@@ -299,13 +367,12 @@ public class MainActivity extends AppCompatActivity {
                     setNextOrderAmount(nextOrderAmount);
                 }
                 else if (responseCode == 401) {
-                    displayErrorMessage("Session timed out, please log in again, GetNextOrder");
                     sendUserBackToLoginActitivy();
                 }
                 else if (responseCode == 404) {
                     // no nextorder found by productId
                     setNextOrderAmount(0);
-                    displayErrorMessage("Next order could not be found");
+                    //displayErrorMessage("Next order could not be found");
                 }
                 else {
                     setNextOrderAmount(0);
@@ -321,13 +388,64 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void setButtonGoEnable(boolean enable){
+    private void getNewMutationFromUser() {
+        // pop up to get information
+        // construct stockMutation
+        // saveNewMutation()
+    }
+
+    private void saveNewMutation(StockMutation mutation) {
+
+        ApiCaller.postStockMutation(mutation, token, new Callback(){
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                int responseCode = response.code();
+                if (responseCode == 200) {
+
+                }
+                else if (responseCode == 400) {
+                    displayErrorMessage("Could not process inputted stockMutation");
+                }
+                else if (responseCode == 401) {
+                    sendUserBackToLoginActitivy();
+                }
+                else {
+                    displayErrorMessage("Unknown error occurred, PostNewStockMutation");
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                setNextOrderAmount(0);
+                displayErrorMessage("Unknown error occurred");
+            }
+        });
+    }
+
+    private void setAllButtonsEnable(boolean enable){
         runOnUiThread(new Runnable(){
 
             @Override
             public void run() {
-                Button buttonGo = findViewById(R.id.btnGo);
-                buttonGo.setEnabled(enable);
+                findViewById(R.id.btnGo).setEnabled(enable);
+                findViewById(R.id.btnScan).setEnabled(enable);
+                findViewById(R.id.btnStockMutation).setEnabled(enable);
+                findViewById(R.id.btnSaveNextOrder).setEnabled(enable);
+                findViewById(R.id.rbStockHistory).setEnabled(enable);
+                findViewById(R.id.rbMutationHistory).setEnabled(enable);
+                findViewById(R.id.rbWeek).setEnabled(enable);
+                findViewById(R.id.rbMonth).setEnabled(enable);
+                findViewById(R.id.rbYear).setEnabled(enable);
+            }
+        });
+    }
+
+    private void setCurrentStockAmount(Integer amount) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                EditText editTextCurrentStock = (findViewById(R.id.inputStockAmount));
+                editTextCurrentStock.setText(amount + "");
             }
         });
     }
@@ -337,7 +455,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void run() {
-                EditText editTextNextOrder = ((EditText)findViewById(R.id.inputNextOrder));
+                EditText editTextNextOrder = (EditText)findViewById(R.id.inputNextOrder);
                 editTextNextOrder.setText(amount + "");
             }
         });
@@ -345,6 +463,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendUserBackToLoginActitivy() {
         // show pop up first, then redirect user back to loginscreen
+        displayErrorMessage("Session timed out, please log in again, GetProductByBarcode");
+
         //Intent intent = new Intent(getBaseContext(), LoginActivity.class);
         //startActivity(intent);
     }

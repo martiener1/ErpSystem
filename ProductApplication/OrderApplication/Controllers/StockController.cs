@@ -61,7 +61,7 @@ namespace StockAPI.Controllers
                 mutation = Json.Deserialize<StockMutation>(value);
             } catch (Exception e)
             {
-                return BadRequest("Could not process inputted mutation");
+                return BadRequest("Could not process inputted mutation\n" + e.StackTrace.ToString());
             }
             await StockService.AddMutation((int)user.storeId, mutation);
             return Ok("Mutation has been posted");

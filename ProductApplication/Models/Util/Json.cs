@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Shared.Util
 {
@@ -12,8 +13,8 @@ namespace Shared.Util
 
         public static T Deserialize<T>(string json)
         {
-
-            return JsonConvert.DeserializeObject<T>(json);
+            var dateTimeConverter = new IsoDateTimeConverter { DateTimeFormat = "yyyy-MM-dd HH:mm:ss" };
+            return JsonConvert.DeserializeObject<T>(json, dateTimeConverter);
         }
     }
 }

@@ -4,8 +4,6 @@ using LoginAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using NUnit.Framework;
 using Shared.Data;
-using StockAPI.Controllers;
-using System;
 using System.Threading.Tasks;
 
 namespace Testing.IntegrationTesting.LoginAPI

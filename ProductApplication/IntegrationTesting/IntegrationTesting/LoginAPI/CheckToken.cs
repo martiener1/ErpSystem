@@ -2,8 +2,14 @@ using LoginAPI.Controllers;
 using LoginAPI.DataAccess;
 using LoginAPI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using NUnit.Framework;
 using Shared.Data;
+using Shared.Util;
+using StockAPI.Controllers;
+using StockAPI.LocalModels;
+using System;
 using System.Threading.Tasks;
 
 namespace Testing.IntegrationTesting.LoginAPI
@@ -13,9 +19,9 @@ namespace Testing.IntegrationTesting.LoginAPI
         [SetUp]
         public async Task Setup()
         {
-            await DatabaseLoginTestFiller.EmptyAndFillDatabases();
-            string connectionString = DatabaseConnectionString.GetAzureConnectionString("logintest");
-            LoginService.dataAccess = new DataAccessImplMySql(connectionString);
+            //await DatabaseLoginTestFiller.EmptyAndFillDatabases();
+            //string connectionString = DatabaseConnectionString.GetAzureConnectionString("logintest");
+            //LoginService.dataAccess = new DataAccessImplMySql(connectionString);
         }
 
         [Test]

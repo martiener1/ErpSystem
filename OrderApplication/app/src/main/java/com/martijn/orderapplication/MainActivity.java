@@ -1,24 +1,29 @@
 package com.martijn.orderapplication;
 
 import android.graphics.Color;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
+import com.martijn.orderapplication.Models.MutationReason;
 import com.martijn.orderapplication.Models.Product;
 import com.martijn.orderapplication.Models.StockMutation;
 import com.martijn.orderapplication.Util.ApiCaller;
@@ -26,6 +31,7 @@ import com.martijn.orderapplication.Util.ApiCaller;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.Date;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -54,11 +60,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onBtnMutationClick(View v) {
-        displayWarningMessage("Not yet implemented");
+        //displayWarningMessage("Not yet implemented");
         // currently not implemented
         // should give an pop-up where you can add a mutation
-        StockMutation stockMutation = new StockMutation();
-        saveNewMutation(stockMutation);
+        if (currentProduct == null) {
+            displayErrorMessage("No product selected");
+        }
+        else {
+            getAndSaveNewMutation();
+        }
     }
 
     public void onBtnSaveNextOrder(View v) {
@@ -95,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else {
                     displayErrorMessage("Unknown error occurred, GetProductByProductNumber");
+                    setAllButtonsEnable(true);
                 }
             }
 
@@ -123,15 +134,18 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else if (responseCode == 404) {
                     // no product found by productnumber or barcode
+                    setAllButtonsEnable(true);
                     displayErrorMessage("No product found with inputted productnumber or barcode");
                 }
-                else {
+                else
+                    setAllButtonsEnable(true);{
                     displayErrorMessage("Unknown error occurred, GetProductByBarcode");
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                setAllButtonsEnable(true);
                 displayErrorMessage("Unknown error occurred, GetProductByBarcode");
             }
         });
@@ -388,23 +402,92 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void getNewMutationFromUser() {
+    private void getAndSaveNewMutation() {
+        setAllButtonsEnable(false);
         // pop up to get information
         // construct stockMutation
         // saveNewMutation()
+
+        AppCompatActivity currentActivity = this;
+
+        runOnUiThread(new Runnable(){
+
+            @Override
+            public void run() {
+                // inflate the layout of the popup window
+                LayoutInflater inflater = (LayoutInflater)
+                        getSystemService(LAYOUT_INFLATER_SERVICE);
+                View popupView = inflater.inflate(R.layout.popup_newmutation, null);
+
+                // create the popup window
+                int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+                int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                //boolean focusable = true; // lets taps outside the popup also dismiss it
+                boolean focusable = true;
+                final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+                Spinner mutationReasonSpinner = popupView.findViewById(R.id.spinnerNewMutationReason);
+                EditText editTextAmount = popupView.findViewById(R.id.editTextNewMutationAmount);
+                Button buttonCancel = popupView.findViewById(R.id.buttonCancel);
+                Button buttonSave = popupView.findViewById(R.id.buttonSave);
+
+                // filling the dropdown with all enum values from mutationReason
+                mutationReasonSpinner.setAdapter(new ArrayAdapter<MutationReason> (currentActivity, android.R.layout.simple_spinner_dropdown_item, MutationReason.values()));
+
+                buttonCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        setAllButtonsEnable(true);
+                        popupWindow.dismiss();
+                    }
+                });
+                buttonSave.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int mutationAmount = Integer.parseInt(editTextAmount.getText().toString());
+                        MutationReason reason = (MutationReason)mutationReasonSpinner.getSelectedItem();
+                        StockMutation mutation = new StockMutation(currentProduct.id, mutationAmount, reason, new Date());
+                        saveNewMutation(mutation);
+                        popupWindow.dismiss();
+                    }
+                });
+
+                popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                    @Override
+                    public void onDismiss() {
+                        setAllButtonsEnable(true);
+                    }
+                });
+
+                // show the popup window
+                // which view you pass in doesn't matter, it is only used for the window tolken
+                popupWindow.showAtLocation(findViewById(android.R.id.content).getRootView() , Gravity.CENTER, 0, 0);
+
+                // dismiss the popup window when touched
+                popupView.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        //popupWindow.dismiss();
+                        return true;
+                    }
+                });
+            }
+        });
     }
 
     private void saveNewMutation(StockMutation mutation) {
-
         ApiCaller.postStockMutation(mutation, token, new Callback(){
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 int responseCode = response.code();
                 if (responseCode == 200) {
-
+                    displayNormalMessage("New mutation has been saved");
                 }
                 else if (responseCode == 400) {
-                    displayErrorMessage("Could not process inputted stockMutation");
+                    Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+                    String json = gson.toJson(mutation);
+                    displayErrorMessage(json + "\n" + token);
+                    //displayErrorMessage("Could not process inputted stockMutation");
                 }
                 else if (responseCode == 401) {
                     sendUserBackToLoginActitivy();
@@ -412,12 +495,13 @@ public class MainActivity extends AppCompatActivity {
                 else {
                     displayErrorMessage("Unknown error occurred, PostNewStockMutation");
                 }
+                setAllButtonsEnable(true);
             }
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                setNextOrderAmount(0);
-                displayErrorMessage("Unknown error occurred");
+                displayErrorMessage("Unknown error occurred, PostNewStockMutation");
+                setAllButtonsEnable(true);
             }
         });
     }
@@ -463,11 +547,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void sendUserBackToLoginActitivy() {
         // show pop up first, then redirect user back to loginscreen
-        displayErrorMessage("Session timed out, please log in again, GetProductByBarcode");
+        displayErrorMessage("Session timed out, please log in again");
+
+        // ask if the user wants to go back to login screen
 
         //Intent intent = new Intent(getBaseContext(), LoginActivity.class);
         //startActivity(intent);
     }
-
-
 }

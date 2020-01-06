@@ -1,6 +1,7 @@
 package com.martijn.orderapplication.Util;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.martijn.orderapplication.Models.StockMutation;
 
 import okhttp3.Callback;
@@ -49,7 +50,8 @@ public class ApiCaller {
 
     public static void postStockMutation(StockMutation mutation, String token, Callback callback) {
         String url = baseUrlStockApi + "mutations";
-        String json = (new Gson()).toJson(mutation);
+        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+        String json = gson.toJson(mutation);
         HttpCall.postDataAsync(url, json, token, callback);
 
     }

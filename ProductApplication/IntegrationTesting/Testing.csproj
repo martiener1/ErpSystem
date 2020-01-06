@@ -22,8 +22,9 @@
   <ItemGroup>
     <ProjectReference Include="..\LoginAPI\LoginAPI.csproj" />
     <ProjectReference Include="..\Models\Shared.csproj" />
-    <ProjectReference Include="..\OrderApplication\StockAPI.csproj" />
+    <ProjectReference Include="..\OrderApplication\OrderAPI.csproj" />
     <ProjectReference Include="..\ProductApplication\ProductAPI.csproj" />
+    <ProjectReference Include="..\StockAPI\StockAPI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

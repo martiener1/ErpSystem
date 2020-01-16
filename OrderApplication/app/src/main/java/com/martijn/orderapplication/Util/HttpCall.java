@@ -57,6 +57,7 @@ public class HttpCall {
         Request request = new Request.Builder()
                 .url(url)
                 .addHeader("token", token)
+                .addHeader("Content-Type", "application/json")
                 .put(body)
                 .build();
         Call call = client.newCall(request);

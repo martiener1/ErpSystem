@@ -7,7 +7,7 @@ using Shared.Models;
 using StockAPI.LocalModels;
 using Shared.Util;
 
-namespace OrderApplication.Services
+namespace StockAPI.Services
 {
     public static class StockService
     {

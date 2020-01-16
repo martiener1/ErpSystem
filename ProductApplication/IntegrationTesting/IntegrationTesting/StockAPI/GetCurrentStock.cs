@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Testing.IntegrationTesting.LoginAPI;
 using StockAPI.Controllers;
 using Shared.Data;
+using StockAPI.Services;
 
 namespace Testing.IntegrationTesting.StockAPI
 {

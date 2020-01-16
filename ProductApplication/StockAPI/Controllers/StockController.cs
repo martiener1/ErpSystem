@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Shared.Models;
 using StockAPI.LocalModels;
+using StockAPI.Services;
 using System.Net.Http;
 using Shared.Util;
 
